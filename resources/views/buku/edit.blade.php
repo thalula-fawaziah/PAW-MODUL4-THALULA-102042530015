@@ -15,8 +15,8 @@
 
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                {{-- TODO 8: Tambahkan atribut enctype="multipart/form-data" pada form di bawah ini --}}
-                <form action="{{ route('buku.update', $buku->id) }}" method="POST">
+               {{-- TODO 8: Tambahkan atribut enctype="multipart/form-data" pada form di bawah ini --}}
+                <form action="{{ route('buku.update', $buku->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -65,6 +65,37 @@
                     </div>
 
                     {{-- TODO 8: Tampilkan gambar sampul saat ini ($buku->cover) dan sediakan input file untuk mengganti sampul --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Sampul Buku Saat Ini</label>
+                        <div class="mb-2">
+                            @if ($buku->cover)
+                                <img id="imagePreview"
+                                     src="{{ asset('storage/' . $buku->cover) }}"
+                                     alt="Sampul {{ $buku->judul }}"
+                                     class="img-thumbnail"
+                                     style="max-height: 200px;">
+                            @else
+                                <img id="imagePreview"
+                                     src=""
+                                     alt="Pratinjau Sampul"
+                                     class="img-thumbnail d-none"
+                                     style="max-height: 200px;">
+                                <span id="noCoverText" class="text-muted small fst-italic">Belum ada sampul.</span>
+                            @endif
+                        </div>
+
+                        <label for="cover" class="form-label fw-semibold">Ganti Sampul (opsional)</label>
+                        <input type="file"
+                               class="form-control @error('cover') is-invalid @enderror"
+                               id="cover"
+                               name="cover"
+                               accept="image/*"
+                               onchange="previewImage(event)">
+                        <div class="form-text">Biarkan kosong jika tidak ingin mengganti. Format: JPG, JPEG, PNG. Maksimal 2MB.</div>
+                        @error('cover')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <div class="d-flex justify-content-end gap-2">
                         <a href="{{ route('buku.index') }}" class="btn btn-light border px-4">Batal</a>
@@ -77,5 +108,25 @@
         </div>
     </div>
 </div>
-@endsection
 
+<script>
+    function previewImage(event) {
+        var input = event.target;
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var preview = document.getElementById('imagePreview');
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+
+                // Sembunyikan teks "Belum ada sampul" jika ada
+                var noCoverText = document.getElementById('noCoverText');
+                if (noCoverText) {
+                    noCoverText.classList.add('d-none');
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+@endsection

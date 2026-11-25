@@ -28,8 +28,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // ============================================================
 // 2. ADMIN ROUTES
 // ============================================================
-// TODO: Tambahkan proteksi middleware 'role:admin' pada grup rute admin di bawah ini
-Route::middleware(['auth'])->group(function () {
+// TODO SELESAI: Tambahkan middleware 'role:admin' untuk proteksi
+Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -44,4 +44,3 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('peminjaman', PeminjamanController::class);
     Route::put('/peminjaman/{peminjaman}/kembali', [PeminjamanController::class, 'kembali'])->name('peminjaman.kembali');
 });
-
